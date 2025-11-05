@@ -1,0 +1,29 @@
+services:
+  # Backend API Service (FastAPI)
+  - type: web
+    name: codebase-genius-api
+    runtime: python
+    rootDir: Assignment-2
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: uvicorn server:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+    healthCheckPath: /health
+    autoDeploy: true
+    plan: free
+
+  # Frontend UI Service (Streamlit)
+  - type: web
+    name: codebase-genius-ui
+    runtime: python
+    rootDir: Assignment-2
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: streamlit run app.py --server.port=$PORT --server.address=0.0.0.0 --server.headless=true --server.enableCORS=false
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: API_URL
+        sync: false  # You'll need to set this manually after backend is deployed
+    autoDeploy: true
+    plan: free
