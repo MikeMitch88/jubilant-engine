@@ -170,7 +170,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # API configuration
-API_BASE_URL = os.getenv("API_URL", "http://localhost:8000")
+API_BASE_URL = os.getenv("API_URL", "https://codebase-genius-api.onrender.com")
 
 
 def check_backend_health():
