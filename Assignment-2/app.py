@@ -174,10 +174,13 @@ API_BASE_URL = os.getenv("API_URL", "https://codebase-genius-api.onrender.com")
 
 
 def check_backend_health():
-    """Check if backend is running"""
+    """Check if backend is running (with cold start tolerance)"""
     try:
-        response = requests.get(f"{API_BASE_URL}/health", timeout=5)
+        # Longer timeout for Render free tier cold starts (can take 30-60 seconds)
+        response = requests.get(f"{API_BASE_URL}/health", timeout=90)
         return response.status_code == 200
+    except requests.exceptions.Timeout:
+        return False
     except:
         return False
 
@@ -239,8 +242,10 @@ def main():
         
         # Backend health check
         st.markdown("### System Status")
-        backend_healthy = check_backend_health()
-        
+
+        with st.spinner("Checking backend status (may take 30-60s if waking up)..."):
+            backend_healthy = check_backend_health()
+
         if backend_healthy:
             st.markdown("""
             <div class="success-box">
@@ -251,7 +256,7 @@ def main():
             st.markdown("""
             <div class="error-box">
                 ❌ Backend: <b>Offline</b><br>
-                <small>Make sure the API server is running</small>
+                <small>Free tier may be sleeping. Try refreshing the page.</small>
             </div>
             """, unsafe_allow_html=True)
         
